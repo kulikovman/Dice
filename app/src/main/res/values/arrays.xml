@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    // Значения задержек после броска (миллисекунды)
+    <integer-array name="delay_after_throw">
+        <item>300</item> // 0.3 сек.
+        <item>500</item> // 0.5 сек.
+        <item>1000</item> // 1 сек.
+        <item>5000</item> // 5 сек.
+        <item>10000</item> // 10 сек.
+    </integer-array>
+
+</resources>

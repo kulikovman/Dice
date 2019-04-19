@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    // Аттрибуты для CubeView
+    <declare-styleable name="CubeView">
+        <attr name="value" format="integer"/>
+        <attr name="angle" format="integer"/>
+        <attr name="shadow" format="boolean"/>
+        <attr name="selected" format="boolean"/>
+        <attr name="type" format="enum">
+            <enum name="white" value="0"/>
+            <enum name="black" value="1"/>
+            <enum name="red" value="2"/>
+        </attr>
+    </declare-styleable>
+
+</resources>
