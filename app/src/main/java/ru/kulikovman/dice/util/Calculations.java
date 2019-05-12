@@ -4,7 +4,6 @@ import android.content.res.Resources;
 
 import javax.inject.Singleton;
 
-import ru.kulikovman.dice.App;
 import ru.kulikovman.dice.R;
 import ru.kulikovman.dice.data.model.Area;
 
@@ -13,8 +12,8 @@ public class Calculations {
 
     private Resources resources;
 
-    public Calculations() {
-        resources = App.getContext().getResources();
+    public Calculations(Resources resources) {
+        this.resources = resources;
     }
 
     public int getScreenWidth() {

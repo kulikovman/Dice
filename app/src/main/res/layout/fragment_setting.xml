@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        tools:context="ru.kulikovman.cubes.SettingFragment">
+
+    <data>
+
+        <variable
+            name="model"
+            type="ru.kulikovman.cubes.SettingFragment"/>
+
+    </data>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:scrollbars="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginRight="20dp"
+            android:orientation="vertical">
+
+            <ImageButton
+                android:id="@+id/button_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="@dimen/margin_20"
+                android:background="@color/transparent"
+                android:onClick="@{() -> model.clickComeBackButton()}"
+                android:src="@drawable/ic_arrow_back_gray"/>
+
+
+            <!-- Количество кубиков -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/SettingTitles"
+                    android:text="@string/number_of_cubes"/>
+
+                <TextView
+                    style="@style/TitleDescriptionStyle"
+                    android:text="@string/description_number_of_cubes"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <SeekBar
+                        android:id="@+id/cubes"
+                        style="@style/Widget.AppCompat.SeekBar.Discrete"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:max="11"
+                        android:progress="3"/>
+
+                    <TextView
+                        android:id="@+id/number_of_cubes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp"
+                        tools:text="4 / 12"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <ImageView
+                style="@style/DividerLine"/>
+
+
+            <!-- Задержка после броска -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/SettingTitles"
+                    android:text="@string/delay_after_roll"/>
+
+                <TextView
+                    style="@style/TitleDescriptionStyle"
+                    android:text="@string/description_delay_after_roll"/>
+
+                <SeekBar
+                    android:id="@+id/delay"
+                    style="@style/Widget.AppCompat.SeekBar.Discrete"
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:max="4"
+                    android:progress="0"/>
+
+                <LinearLayout
+                    android:layout_width="210dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="@string/delay_0_3"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="@string/delay_0_5"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="@string/delay_1"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="@string/delay_5"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="@string/delay_10"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <ImageView
+                style="@style/DividerLine"/>
+
+
+            <!-- Выбор кубиков -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/SettingTitles"
+                    android:text="@string/choice_of_cubes"/>
+
+                <TextView
+                    style="@style/TitleDescriptionStyle"
+                    android:text="@string/description_choose_cube"/>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="20dp"
+                    android:orientation="horizontal">
+
+                    <ru.kulikovman.cubes.view.CubeView
+                        android:id="@+id/white_cube"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:onClick="@{(view) -> model.clickChooseCube(view)}"
+                        app:shadow="true"
+                        app:type="white"
+                        app:value="3"/>
+
+                    <ru.kulikovman.cubes.view.CubeView
+                        android:id="@+id/red_cube"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:onClick="@{(view) -> model.clickChooseCube(view)}"
+                        app:shadow="true"
+                        app:type="red"
+                        app:value="4"/>
+
+                    <ru.kulikovman.cubes.view.CubeView
+                        android:id="@+id/black_cube"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:onClick="@{(view) -> model.clickChooseCube(view)}"
+                        app:shadow="true"
+                        app:type="black"
+                        app:value="5"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <ImageView
+                style="@style/DividerLine"/>
+
+
+            <!-- Не катать кубики по полю -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <Switch
+                    android:id="@+id/do_not_roll_cubes"
+                    style="@style/SwitchBase"
+                    android:text="@string/do_not_roll_cubes"/>
+
+                <TextView
+                    style="@style/SwitchDescriptionStyle"
+                    android:text="@string/description_do_not_roll_cubes"/>
+
+            </LinearLayout>
+
+            <ImageView
+                style="@style/DividerSpace"/>
+
+
+            <!-- Держать экран включенным -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <Switch
+                    android:id="@+id/keep_screen_on"
+                    style="@style/SwitchBase"
+                    android:text="@string/keep_screen_on"/>
+
+                <TextView
+                    style="@style/SwitchDescriptionStyle"
+                    android:text="@string/description_keep_screen_on"/>
+
+            </LinearLayout>
+
+            <ImageView
+                style="@style/DividerSpace"/>
+
+
+            <!-- Включить темную тему -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <Switch
+                    android:id="@+id/enable_dark_theme"
+                    style="@style/SwitchBase"
+                    android:text="@string/enable_dark_theme"/>
+
+                <TextView
+                    style="@style/SwitchDescriptionStyle"
+                    android:text="@string/description_enable_dark_theme"/>
+
+            </LinearLayout>
+
+            <ImageView
+                style="@style/DividerSpace"/>
+
+
+            <!-- Показываь сумму броска -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <Switch
+                    android:id="@+id/show_throw_amount"
+                    style="@style/SwitchBase"
+                    android:text="@string/show_throw_amount"/>
+
+            </LinearLayout>
+
+            <ImageView
+                style="@style/DividerSpace"/>
+
+
+            <!-- Деление экрана на части -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <Switch
+                    android:id="@+id/divide_screen"
+                    style="@style/SwitchBase"
+                    android:text="@string/divide_screen"/>
+
+                <TextView
+                    style="@style/SwitchDescriptionStyle"
+                    android:text="@string/description_divide_screen"/>
+
+            </LinearLayout>
+
+
+            <!-- Пустое пространство в конце экрана -->
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="20dp"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</layout>

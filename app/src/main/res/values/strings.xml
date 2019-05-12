@@ -1,3 +1,52 @@
 <resources>
-    <string name="app_name">Dice</string>
+
+    // Количество кубиков
+    <string name="one_cube" translatable="false">1</string>
+    <string name="two_cubes" translatable="false">2</string>
+    <string name="three_cubes" translatable="false">3</string>
+    <string name="four_cubes" translatable="false">4</string>
+    <string name="five_cubes" translatable="false">5</string>
+    <string name="six_cubes" translatable="false">6</string>
+
+    // Задержка после броска
+    <string name="delay_0_3" translatable="false">0.3</string>
+    <string name="delay_0_5" translatable="false">0.5</string>
+    <string name="delay_1" translatable="false">1</string>
+    <string name="delay_5" translatable="false">5</string>
+    <string name="delay_10" translatable="false">10</string>
+
+    // Тексты настроек
+    <string name="number_of_cubes">Number of cubes</string>
+    <string name="delay_after_roll">Delay after throw</string>
+    <string name="additional_options">Additional options</string>
+    <string name="keep_screen_on">Keep the screen on</string>
+    <string name="show_throw_amount">Show the throw amount</string>
+    <string name="choice_of_cubes">Choice of cubes</string>
+    <string name="divide_screen">Divide the screen into parts</string>
+    <string name="enable_dark_theme">Enable dark theme</string>
+    <string name="do_not_roll_cubes">Don\'t roll cubes</string>
+
+    // Тексты подсказок для заголовков и переключателей
+    <string name="description_number_of_cubes">This number of dice will be used for the next roll.</string>
+    <string name="description_delay_after_roll">Helps to avoid accidental throw.</string>
+    <string name="description_keep_screen_on">Does not allow the device to go to sleep.</string>
+    <string name="description_show_throw_amount">Shows the total amount of cubes after the roll.</string>
+    <string name="description_choose_cube">The selected cubes will be used for the next roll.</string>
+    <string name="description_divide_screen">Divides the screen into four equal parts.</string>
+    <string name="description_enable_dark_theme">On modern devices, a dark theme saves battery power.</string>
+    <string name="description_do_not_roll_cubes">The cubes will fall in rows in the center of the screen.</string>
+
+    // Тексты кнопок
+    <string name="button_ok" translatable="false">OK</string>
+    <string name="button_rate">Rate</string>
+    <string name="button_already_rated">Already rated</string>
+    <string name="button_remind_later">Remind me later</string>
+    <string name="button_extended_version">Extended version</string>
+
+    // Прочие тексты
+    <string name="app_name">Cubes</string>
+    <string name="label_number_of_cubes" translatable="false">%d / %d</string>
+    <string name="rate_message">If you like the app, please rate it in Google Play. This will greatly help its further development.</string>
+
+
 </resources>

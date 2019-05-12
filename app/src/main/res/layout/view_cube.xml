@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/cube_view_container"
+        tools:context="ru.kulikovman.cubes.view.CubeView">
+
+    <data>
+
+        <import type="android.view.View"/>
+
+        <variable
+            name="model"
+            type="ru.kulikovman.cubes.view.CubeView"/>
+
+    </data>
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@{model.marginStart}"
+        android:layout_marginTop="@{model.marginTop}">
+
+        <ImageView
+            android:id="@+id/shadow"
+            android:layout_width="@dimen/cube_view_size"
+            android:layout_height="@dimen/cube_view_size"
+            android:layout_gravity="center"
+            android:rotation="@{model.angle}"
+            android:scaleType="fitCenter"
+            android:visibility="invisible"
+            app:srcCompat="@drawable/white_lite_0"
+            tools:visibility="visible"/>
+
+        <ImageView
+            android:id="@+id/cube"
+            android:layout_width="@dimen/cube_view_size"
+            android:layout_height="@dimen/cube_view_size"
+            android:layout_gravity="center"
+            android:rotation="@{model.angle}"
+            android:scaleType="fitCenter"
+            android:visibility="visible"
+            app:srcCompat="@drawable/white_lite_5"
+            tools:rotation="0"/>
+
+        <ImageView
+            android:id="@+id/selection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_margin="8dp"
+            android:visibility="invisible"
+            app:srcCompat="@drawable/ic_check_circle_blue_30dp"
+            tools:visibility="visible"/>
+
+        <!--
+        Это вью нужно для визуального определения размера кубика.
+        Все новые скины должны визуально точно вписываться в этот размер!
+        -->
+        <ImageView
+            android:layout_width="@dimen/cube_size"
+            android:layout_height="@dimen/cube_size"
+            android:layout_gravity="center"
+            android:visibility="invisible"/>
+
+    </FrameLayout>
+
+</layout>

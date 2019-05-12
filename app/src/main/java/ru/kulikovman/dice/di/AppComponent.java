@@ -1,7 +1,11 @@
 package ru.kulikovman.dice.di;
 
-import dagger.Component;
+import javax.inject.Singleton;
 
-@Component()
+import dagger.Component;
+import ru.kulikovman.dice.di.module.RepositoryModule;
+
+@Singleton
+@Component(modules = {RepositoryModule.class})
 public interface AppComponent {
 }

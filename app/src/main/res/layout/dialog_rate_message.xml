@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:gravity="center"
+        android:text="@string/rate_message"
+        android:textSize="18sp"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="20dp"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_star_gold_24dp"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_star_gold_24dp"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_star_gold_24dp"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_star_gold_24dp"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_star_gold_24dp"/>
+
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/button_rate"
+        style="@style/ButtonNext"
+        android:text="@string/button_rate"/>
+
+    <Button
+        android:id="@+id/button_already_rated"
+        style="@style/ButtonAfterNext"
+        android:layout_marginTop="12dp"
+        android:text="@string/button_already_rated"/>
+
+    <Button
+        android:id="@+id/button_remind_later"
+        style="@style/ButtonAfterNext"
+        android:layout_marginBottom="20dp"
+        android:text="@string/button_remind_later"/>
+
+</LinearLayout>

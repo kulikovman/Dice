@@ -6,27 +6,23 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import ru.kulikovman.dice.data.Kind;
 import ru.kulikovman.dice.data.model.Cube;
 import ru.kulikovman.dice.db.model.Settings;
 
-@Singleton
 public class CubeGenerator {
 
     private final int FAILURE_LIMIT = 30; // Лимит неудачных бросков (с пересечением кубиков)
 
-    @Inject
     private Calculations calculations;
-
-    @Inject
     private Settings settings;
-
-    @Inject
     private Intersection intersection;
 
+    public CubeGenerator(Calculations calculations, Settings settings, Intersection intersection) {
+        this.calculations = calculations;
+        this.settings = settings;
+        this.intersection = intersection;
+    }
 
     public List<Cube> getListOfCubes() {
         return settings.isNotRolling() ? getRowCubes() : getRollCubes();
@@ -90,14 +86,14 @@ public class CubeGenerator {
 
 
     private List<Cube> getRowCubes() {
-        CubeType cubeType = CubeType.valueOf(settings.getKindOfCube());
+        Kind cubeType = Kind.valueOf(settings.getKindOfCube());
         List<List<Point>> points = getListOfPoints();
 
         // Создаем кубики на основе сгенерированных координат
         List<Cube> cubes = new ArrayList<>();
         for (List<Point> line : points) {
             for (Point point : line){
-                cubes.add(new Cube(calculation, cubeType, point));
+                cubes.add(new Cube(calculations, cubeType, point));
             }
         }
 
@@ -108,7 +104,7 @@ public class CubeGenerator {
         List<List<Point>> points = new ArrayList<>();
 
         int cubes = settings.getNumberOfCubes();
-        int rows = calculation.getMaxCubesPerHeight();
+        int rows = calculations.getMaxCubesPerHeight();
         while (cubes > 0) {
             int remainder = cubes / rows < 1 || cubes % rows != 0 ? 1 : 0;
             int cubesPerRow = cubes / rows + remainder;
@@ -125,7 +121,7 @@ public class CubeGenerator {
             // 1 / 2 = 0 + (1) = 1
 
             // Получаем Y последнего ряда и размер кубика
-            int space = calculation.getSpaceBetweenCentersOfCubes();
+            int space = calculations.getSpaceBetweenCentersOfCubes();
             int y = points.size() != 0 ? points.get(points.size() - 1).get(0).y + space : 0;
 
             // Создаем линию точек и добавляем в общий список
@@ -145,9 +141,9 @@ public class CubeGenerator {
         // Вычисляем отступы для центрирования массива точек
         int width = points.get(0).get(points.get(0).size() - 1).x;
         int height = points.get(points.size() - 1).get(0).y;
-        int title = calculation.getTitleHeight();
-        int offsetX = (calculation.getScreenWidth() - width) / 2;
-        int offsetY = title + (calculation.getScreenHeight() - title * 2 - height) / 2;
+        int title = calculations.getTitleHeight();
+        int offsetX = (calculations.getScreenWidth() - width) / 2;
+        int offsetY = title + (calculations.getScreenHeight() - title * 2 - height) / 2;
 
         // Центрируем массив точек
         for (List<Point> line : points) {

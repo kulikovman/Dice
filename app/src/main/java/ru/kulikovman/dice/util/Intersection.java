@@ -2,14 +2,16 @@ package ru.kulikovman.dice.util;
 
 import android.graphics.Point;
 
-import javax.inject.Singleton;
-
 import ru.kulikovman.dice.data.model.Area;
-import ru.kulikovman.dice.util.Calculations;
 import ru.kulikovman.dice.data.model.Cube;
 
-@Singleton
 public class Intersection {
+
+    private Calculations calculations;
+
+    public Intersection(Calculations calculations) {
+        this.calculations = calculations;
+    }
 
     // Проверка пересечения кубика с указанной областью
     public boolean withArea(Area area, int cubeOuterRadius, Point position) {

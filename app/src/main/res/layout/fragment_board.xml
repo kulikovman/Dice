@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        tools:context="ru.kulikovman.cubes.BoardFragment">
+
+    <data>
+
+        <import type="android.view.View"/>
+
+        <import type="ru.kulikovman.cubes.helper.Utils"/>
+
+        <variable
+            name="model"
+            type="ru.kulikovman.cubes.BoardFragment"/>
+
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Элементы интерфейса на доске -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Кнопка настроек -->
+                    <ImageButton
+                        android:id="@+id/button_setting"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="@dimen/margin_20"
+                        android:background="@color/transparent"
+                        android:onClick="@{() -> model.openSetting()}"
+                        android:src="@drawable/ic_settings_gray"/>
+
+                    <!-- Сумма броска -->
+                    <TextView
+                        android:id="@+id/throw_amount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="14dp"
+                        android:textColor="@color/gray_5"
+                        android:textSize="20sp"
+                        android:visibility="@{model.settings.shownThrowAmount ? View.VISIBLE : View.GONE}"
+                        tools:text="28"
+                        tools:visibility="visible"/>
+
+                </LinearLayout>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="20dp">
+
+                    <!-- Вертикальная линия -->
+                    <ImageView
+                        android:id="@+id/vertical_line"
+                        android:layout_width="2dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center_horizontal"
+                        android:background="@color/gray_3"
+                        android:visibility="@{model.settings.divideScreen ? View.VISIBLE : View.GONE}"
+                        tools:visibility="visible"/>
+
+                </FrameLayout>
+
+            </LinearLayout>
+
+            <!-- Горизонтальная линия -->
+            <ImageView
+                android:id="@+id/horizontal_line"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:background="@color/gray_3"
+                android:visibility="@{model.settings.divideScreen ? View.VISIBLE : View.GONE}"
+                tools:visibility="visible"/>
+
+        </FrameLayout>
+
+
+        <!-- Доска для теней -->
+        <FrameLayout
+            android:id="@+id/bottom_board"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <!-- Доска для кубиков -->
+        <FrameLayout
+            android:id="@+id/top_board"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+
+        <!-- Кнопка перемотки -->
+        <ImageView
+            android:id="@+id/rewind_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_fast_rewind_gray_250dp"
+            android:visibility="invisible"
+            tools:visibility="invisible"/>
+
+
+        <!-- Кнопка сброса -->
+        <ImageView
+            android:id="@+id/button_of_throw"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="70dp"
+            android:layout_marginEnd="30dp"
+            android:layout_marginBottom="30dp"
+            android:background="@color/transparent"
+            android:onClick="@{() -> model.throwCubes()}"/>
+
+    </FrameLayout>
+
+</layout>
