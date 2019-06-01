@@ -5,7 +5,7 @@ import java.util.List;
 
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
-import ru.kulikovman.dice.data.model.CubeLite;
+import ru.kulikovman.dice.data.model.Cube;
 
 @Entity
 public class ThrowResult {
@@ -14,11 +14,16 @@ public class ThrowResult {
     private long id;
 
     private long time;
-    private List<CubeLite> cubeLites;
+    private List<Cube> cubes;
 
     public ThrowResult() {
         time = System.currentTimeMillis();
-        cubeLites = new ArrayList<>();
+        cubes = new ArrayList<>();
+    }
+
+    public ThrowResult(List<Cube> cubes) {
+        time = System.currentTimeMillis();
+        this.cubes = cubes;
     }
 
     public long getId() {
@@ -37,15 +42,19 @@ public class ThrowResult {
         this.time = time;
     }
 
-    public List<CubeLite> getCubeLites() {
-        return cubeLites;
+    public List<Cube> getCubes() {
+        return cubes;
     }
 
-    public void setCubeLites(List<CubeLite> cubeLites) {
-        this.cubeLites = cubeLites;
+    public void setCubes(List<Cube> cubes) {
+        this.cubes = cubes;
     }
 
-    public void addCubeLite(CubeLite cubeLite) {
-        cubeLites.add(cubeLite);
+    public void addCube(Cube cube) {
+        cubes.add(cube);
+    }
+
+    public void addCubes(List<Cube> cubes) {
+        this.cubes = cubes;
     }
 }

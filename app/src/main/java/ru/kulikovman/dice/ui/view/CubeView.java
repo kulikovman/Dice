@@ -3,22 +3,22 @@ package ru.kulikovman.dice.ui.view;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.databinding.BindingAdapter;
-import android.databinding.DataBindingUtil;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.BindingAdapter;
+import androidx.databinding.DataBindingUtil;
 import ru.kulikovman.cubes.CubesViewModel;
 import ru.kulikovman.cubes.MainActivity;
-import ru.kulikovman.cubes.R;
-import ru.kulikovman.cubes.data.CubeType;
-import ru.kulikovman.cubes.databinding.ViewCubeBinding;
-import ru.kulikovman.cubes.model.Cube;
-import ru.kulikovman.cubes.model.CubeLite;
+import ru.kulikovman.dice.R;
+import ru.kulikovman.dice.data.Kind;
+import ru.kulikovman.dice.data.model.Cube;
+import ru.kulikovman.dice.data.model.CubeLite;
+import ru.kulikovman.dice.databinding.ViewCubeBinding;
 
 
 public class CubeView extends FrameLayout {
@@ -26,7 +26,7 @@ public class CubeView extends FrameLayout {
     private ViewCubeBinding binding;
     private Context context;
 
-    private CubeType cubeType;
+    private Kind kind;
     private int value;
     public int angle;
     public boolean isShadow;
@@ -103,7 +103,7 @@ public class CubeView extends FrameLayout {
         angle = a.getInt(R.styleable.CubeView_angle, 0);
         isShadow = a.getBoolean(R.styleable.CubeView_shadow, false);
         isSelected = a.getBoolean(R.styleable.CubeView_selected, false);
-        cubeType = CubeType.values()[a.getInt(R.styleable.CubeView_type, 0)];
+        kind = Kind.values()[a.getInt(R.styleable.CubeView_type, 0)];
         a.recycle();
 
         if (!isInEditMode()) {
@@ -116,7 +116,7 @@ public class CubeView extends FrameLayout {
     }
 
     public void setCube(Cube cube) {
-        cubeType = cube.getCubeType();
+        kind = Kind.valueOf(cube.getKindOfCube());
         value = cube.getValue();
         angle = cube.getDegrees();
         marginStart = cube.getMarginStart();
@@ -127,7 +127,7 @@ public class CubeView extends FrameLayout {
     }
 
     public void setCube(CubeLite cubeLite) {
-        cubeType = CubeType.valueOf(cubeLite.getSkin());
+        kind = Kind.valueOf(cubeLite.getKindOfCube());
         value = cubeLite.getValue();
         angle = cubeLite.getAngle();
         marginStart = cubeLite.getMarginStart();
@@ -142,7 +142,7 @@ public class CubeView extends FrameLayout {
         CubesViewModel model = ViewModelProviders.of((MainActivity) context).get(CubesViewModel.class);
 
         String theme = model.getSettings().isDarkTheme() ? "dark" : "lite";
-        String skinName = cubeType.name().toLowerCase();
+        String skinName = kind.name().toLowerCase();
         binding.cube.setImageResource(getDrawableIdByName(skinName + "_" + theme + "_" + String.valueOf(value)));
 
         // Показываем тень, если указана
@@ -173,7 +173,7 @@ public class CubeView extends FrameLayout {
     }
 
     public String getCubeColor() {
-        return cubeType.name();
+        return kind.name();
     }
 
     @BindingAdapter({"android:layout_marginStart"})

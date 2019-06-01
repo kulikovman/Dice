@@ -42,18 +42,18 @@ public class CubeGenerator {
             } else {
                 // Проверяем пересечение с другими кубиками
                 int count = 0;
-                boolean intersection = true;
-                while (intersection) {
+                boolean intersec = true;
+                while (intersec) {
                     for (Cube currentCube : cubes) {
-                        if (Intersection.betweenCubes(cube, currentCube)) {
-                            intersection = true;
+                        if (intersection.betweenCubes(cube, currentCube)) {
+                            intersec = true;
                             break;
                         } else {
-                            intersection = false;
+                            intersec = false;
                         }
                     }
 
-                    if (intersection) {
+                    if (intersec) {
                         // Если есть пересечение
                         count++;
                         Log.d("myLog", "cube intersection: " + count);
@@ -70,7 +70,7 @@ public class CubeGenerator {
 
                             cubes.add(cube);
                             Log.d("myLog", "Add cube " + cubes.size() + ": " + cube.getPosition().x + ", " + cube.getPosition().y);
-                            intersection = false;
+                            intersec = false;
                         }
                     } else {
                         // Если нет пересечений

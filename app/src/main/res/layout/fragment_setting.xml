@@ -2,13 +2,13 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
-        tools:context="ru.kulikovman.cubes.SettingFragment">
+        tools:context="ru.kulikovman.dice.SettingFragment">
 
     <data>
 
         <variable
             name="model"
-            type="ru.kulikovman.cubes.SettingFragment"/>
+            type="ru.kulikovman.dice.SettingFragment"/>
 
     </data>
 

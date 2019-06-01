@@ -53,7 +53,7 @@ public class SettingFragment extends Fragment {
         // Получение вью модел
         model = ViewModelProviders.of(activity).get(DiceViewModel.class);
         settings = model.getSettings();
-        calculation = model.getCalculation();
+        calculation = model.getCalculations();
 
         // Подключение звука
         SoundManager.initialize();

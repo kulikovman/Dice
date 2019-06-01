@@ -1,48 +1,182 @@
 package ru.kulikovman.dice;
 
-import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
-import android.databinding.DataBindingUtil;
-import android.hardware.Sensor;
-import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.fragment.NavHostFragment;
-import ru.kulikovman.cubes.databinding.FragmentBoardBinding;
-import ru.kulikovman.cubes.dialog.RateDialog;
-import ru.kulikovman.cubes.helper.CubeGenerator;
-import ru.kulikovman.cubes.model.Calculation;
-import ru.kulikovman.cubes.model.Cube;
-import ru.kulikovman.cubes.model.CubeLite;
-import ru.kulikovman.cubes.model.Settings;
-import ru.kulikovman.cubes.model.ThrowResult;
-import ru.kulikovman.cubes.view.CubeView;
-import ru.kulikovman.cubes.view.ShadowView;
+import ru.kulikovman.dice.data.model.Cube;
+import ru.kulikovman.dice.databinding.FragmentBoardBinding;
+import ru.kulikovman.dice.db.model.Settings;
+import ru.kulikovman.dice.db.model.ThrowResult;
+import ru.kulikovman.dice.ui.dialog.RateDialog;
+import ru.kulikovman.dice.ui.view.CubeView;
+import ru.kulikovman.dice.ui.view.ShadowView;
+import ru.kulikovman.dice.util.SoundManager;
 
-
-public class BoardFragment extends Fragment implements RateDialog.Listener {
-
-    private static final int LIMIT_OF_THROW = 100; // После 100 бросков будут запрошен отзыв
+public class BoardFragment extends Fragment {
 
     private FragmentBoardBinding binding;
-    private MainActivity activity;
-    private DiceViewModel model;
-    public Settings settings;
-    private Calculation calculation;
+    private DiceViewModel viewModel;
+
+    private Settings settings;
+
+    private SoundManager soundManager;
+
+    private boolean isReadyForThrow;
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_board, container, false);
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        viewModel = ViewModelProviders.of(this).get(DiceViewModel.class);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        // Делаем всякие штуки при первом входе...
+
+        // Инициализация
+        isReadyForThrow = true;
+
+
+        // Показать результат последнего броска
+
+        // Запросить отзыв (при соблюдении условий)
+        showRateDialog();
+
+
+
+
+        // Обновление переменной в макете
+        binding.setModel(this);
+    }
+
+    // Запрос отзыва
+    private void showRateDialog() {
+        // Если диалог еще не показывался и было сделано достаточно бросков
+        if (viewModel.isNeedShowRateDialog()) {
+            RateDialog rateDialog = new RateDialog();
+            rateDialog.setCancelable(false);
+            rateDialog.show(this.getChildFragmentManager(), "rateDialog");
+
+            // Обрабатываем выбор пользователя
+            rateDialog.setListener(new RateDialog.Listener() {
+                @Override
+                public void rateButtonPressed() {
+                    // Отмечаем, что приложение оценено
+                    settings.setRated(true);
+                }
+
+                @Override
+                public void remindLaterButtonPressed() {
+                    // Сбрасываем счетчик, чтобы показать диалог позже
+                    settings.setNumberOfThrow(0);
+                }
+            });
+        }
+    }
+
+
+
+    // Показать результат последнего броска
+    private void showLastResult() {
+
+    }
+
+    // Показать предыдущий бросок из истории бросков
+    public void showLastResult() {
+
+    }
+
+
+    // Сделать бросок кубиков
+    public void throwCubes() {
+        // Если время задержки не прошло, то выходим
+        if (!isReadyForThrow) {
+            return;
+        }
+
+        // Подготовка к броску
+        clearBoards();
+        int total = 0;
+
+        for (Cube cube : viewModel.getCubes()) {
+            // Считаем сумму кубиков
+            total += cube.getValue();
+
+            // Размещаем вью на экране
+            binding.topBoard.addView(new CubeView(getActivity(), cube));
+            binding.bottomBoard.addView(new ShadowView(getActivity(), cube));
+        }
+
+        // Звук броска
+        soundManager.playSound(SoundManager.THROW_CUBES_SOUND);
+
+        // Сумма броска
+        binding.total.setText(String.valueOf(total));
+
+        // Задержка после броска
+        isReadyForThrow = false;
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                isReadyForThrow = true;
+            }
+        }, settings.getDelayAfterThrow());
+    }
+
+    private void clearBoards() {
+        binding.topBoard.removeAllViews();
+        binding.bottomBoard.removeAllViews();
+    }
+
+    public void openSetting() {
+        soundManager.playSound(SoundManager.TOP_BUTTON_CLICK_SOUND);
+        NavHostFragment.findNavController(BoardFragment.this).navigate(R.id.action_cubesOnBoardFragment_to_settingFragment);
+    }
+
+
+
+
+
+
+
+
+
+
+    private void showDividers(boolean isShow) {
+        binding.verticalLine.setVisibility(isShow ? View.VISIBLE : View.GONE);
+        binding.horizontalLine.setVisibility(isShow ? View.VISIBLE : View.GONE);
+    }
+
+    private void showTotal(boolean isShow) {
+        binding.total.setVisibility(isShow ? View.VISIBLE : View.GONE);
+    }
+
+
+
+
+
+
+    /*
+
 
     private SensorManager sensorManager;
     private Sensor accelerometer;
@@ -52,14 +186,8 @@ public class BoardFragment extends Fragment implements RateDialog.Listener {
     private boolean isReadyForThrow;
     private int delayAfterThrow;
     private int resultOnScreen;
-    public int sumOfCubes;
+    public int total;
 
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_board, container, false);
-        return binding.getRoot();
-    }
 
     @Override
     public void onAttach(Context context) {
@@ -72,7 +200,7 @@ public class BoardFragment extends Fragment implements RateDialog.Listener {
         // Получение вью модел
         model = ViewModelProviders.of(activity).get(DiceViewModel.class);
         settings = model.getSettings();
-        calculation = model.getCalculation();
+        calculations = model.getCalculations();
 
         // Инициализация
         throwResults = new ArrayList<>();
@@ -176,10 +304,7 @@ public class BoardFragment extends Fragment implements RateDialog.Listener {
         });
     }
 
-    public void openSetting() {
-        SoundManager.get().playSound(SoundManager.TOP_BUTTON_CLICK_SOUND);
-        NavHostFragment.findNavController(BoardFragment.this).navigate(R.id.action_cubesOnBoardFragment_to_settingFragment); // Здесь происходит ошибка!
-    }
+
 
     public void showLastThrowResult() {
         // Номер текущего броска
@@ -233,14 +358,14 @@ public class BoardFragment extends Fragment implements RateDialog.Listener {
 
     private void drawCubeFromHistory(int rollResultNumber) {
         // Сбрасываем сумму
-        sumOfCubes = 0;
+        total = 0;
 
         // Размещаем кубики на доске + подсчет их суммы
         List<CubeLite> cubeLites = throwResults.get(rollResultNumber).getCubeLites();
         for (CubeLite cubeLite : cubeLites) {
             binding.topBoard.addView(new CubeView(activity, cubeLite));
             binding.bottomBoard.addView(new ShadowView(activity, cubeLite));
-            sumOfCubes += cubeLite.getValue();
+            total += cubeLite.getValue();
         }
 
         // Отображение суммы броска
@@ -248,8 +373,8 @@ public class BoardFragment extends Fragment implements RateDialog.Listener {
     }
 
     private void showThrowAmount() {
-        if (settings.isShownThrowAmount() && sumOfCubes != 0) {
-            binding.throwAmount.setText(String.valueOf(sumOfCubes));
+        if (settings.isShownThrowAmount() && total != 0) {
+            binding.throwAmount.setText(String.valueOf(total));
         } else {
             binding.throwAmount.setText(null);
         }
@@ -264,14 +389,14 @@ public class BoardFragment extends Fragment implements RateDialog.Listener {
         // Подготовка к броску
         clearBoards();
         resultOnScreen = 0;
-        sumOfCubes = 0;
+        total = 0;
 
         // Генирируем новые кубики
-        List<Cube> cubes = CubeGenerator.get().getCubes(calculation, settings);
+        List<Cube> cubes = CubeGenerator.get().getCubes(calculations, settings);
 
         for (Cube cube : cubes) {
             // Считаем сумму кубиков
-            sumOfCubes += cube.getValue();
+            total += cube.getValue();
 
             // Создаем вью кубика + тень
             CubeView cubeView = new CubeView(activity, cube);
@@ -292,7 +417,7 @@ public class BoardFragment extends Fragment implements RateDialog.Listener {
         // Сохраняем результаты текущего броска в базу
         ThrowResult throwResult = new ThrowResult();
         for (Cube cube : cubes) {
-            throwResult.addCubeLite(cube.getCubeLite());
+            throwResult.addCube(cube.getCubeLite());
         }
 
         model.getRepository().saveThrowResult(throwResult);
@@ -309,8 +434,5 @@ public class BoardFragment extends Fragment implements RateDialog.Listener {
         Log.d("myLog", "---------------------------");
     }
 
-    private void clearBoards() {
-        binding.topBoard.removeAllViews();
-        binding.bottomBoard.removeAllViews();
-    }
+    */
 }

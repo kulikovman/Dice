@@ -20,40 +20,42 @@ public class Intersection {
     }
 
     // Проверка пересечения кубика с кубиком
-    public static boolean betweenCubes(Cube c1, Cube c2) {
+    public boolean betweenCubes(Cube c1, Cube c2) {
         // Расчет растояния между центрами кубиков
-        int distance = (int) Math.sqrt((Math.pow(Math.abs(c1.getX() - c2.getX()), 2) + Math.pow(Math.abs(c1.getY() - c2.getY()), 2)));
+        int distance = (int) Math.sqrt((Math.pow(Math.abs(c1.getPosition().x - c2.getPosition().x), 2) + Math.pow(Math.abs(c1.getPosition().y - c2.getPosition().y), 2)));
 
         // ЭТАП 1: проверка по внешним радиусам
         // Если больше суммы внешних радиусов, то все ок
-        if (distance > calculation.getCubeOuterRadius() * 2) {
+        if (distance > calculations.getCubeOuterRadius() * 2) {
             return false;
         }
 
         // ЭТАП 2: проверка по внутренним радиусам
         // Если меньше суммы радиусов, то кубики 100% пересекаются
-        if (distance < calculation.getCubeInnerRadius() * 2) {
+        if (distance < calculations.getCubeInnerRadius() * 2) {
             return true;
         }
 
         // ЭТАП 3: проверка пересечения вершин и кубиков
         // Первый кубик и точки второго кубика
-        if (isPointInsideCube(c1, c2.getA().x, c2.getA().y) || isPointInsideCube(c1, c2.getB().x, c2.getB().y) ||
-                isPointInsideCube(c1, c2.getC().x, c2.getC().y) || isPointInsideCube(c1, c2.getD().x, c2.getD().y)) {
-            return true;
+        for (Point point : c2.getCubeTops()) {
+            if (isPointInsideCube(c1, point)) {
+                return true;
+            }
         }
 
         // Второй кубик и точки первого кубика
-        if (isPointInsideCube(c2, c1.getA().x, c1.getA().y) || isPointInsideCube(c2, c1.getB().x, c1.getB().y) ||
-                isPointInsideCube(c2, c1.getC().x, c1.getC().y) || isPointInsideCube(c2, c1.getD().x, c1.getD().y)) {
-            return true;
+        for (Point point : c1.getCubeTops()) {
+            if (isPointInsideCube(c2, point)) {
+                return true;
+            }
         }
 
         // Кубики не пересекаются
         return false;
     }
 
-    private static boolean isPointInsideCube(Cube cube, int pX, int pY) {
+    private boolean isPointInsideCube(Cube cube, Point point) {
         // Делим куб на два треугольника и проверяем принадлежность
         // точек одного куба к треугольникам другого
 
@@ -62,15 +64,18 @@ public class Intersection {
         // | \ |
         // d - c
 
-        int ax = cube.getA().x;
-        int bx = cube.getB().x;
-        int cx = cube.getC().x;
-        int dx = cube.getD().x;
+        int pX = point.x;
+        int pY = point.y;
 
-        int ay = cube.getA().y;
-        int by = cube.getB().y;
-        int cy = cube.getC().y;
-        int dy = cube.getD().y;
+        int ax = cube.getCubeTops().get(0).x;
+        int bx = cube.getCubeTops().get(1).x;
+        int cx = cube.getCubeTops().get(2).x;
+        int dx = cube.getCubeTops().get(3).x;
+
+        int ay = cube.getCubeTops().get(0).y;
+        int by = cube.getCubeTops().get(1).y;
+        int cy = cube.getCubeTops().get(2).y;
+        int dy = cube.getCubeTops().get(3).y;
 
         // Треугольник ABC
         int ab = (ax - pX) * (by - ay) - (bx - ax) * (ay - pY);

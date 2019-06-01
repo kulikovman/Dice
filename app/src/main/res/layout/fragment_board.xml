@@ -2,17 +2,17 @@
 
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
-        tools:context="ru.kulikovman.cubes.BoardFragment">
+        tools:context="ru.kulikovman.dice.BoardFragment">
 
     <data>
 
         <import type="android.view.View"/>
 
-        <import type="ru.kulikovman.cubes.helper.Utils"/>
+        <import type="ru.kulikovman.dice.util.Utils"/>
 
         <variable
             name="model"
-            type="ru.kulikovman.cubes.BoardFragment"/>
+            type="ru.kulikovman.dice.BoardFragment"/>
 
     </data>
 
@@ -48,14 +48,14 @@
 
                     <!-- Сумма броска -->
                     <TextView
-                        android:id="@+id/throw_amount"
+                        android:id="@+id/total"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
                         android:layout_marginTop="14dp"
                         android:textColor="@color/gray_5"
                         android:textSize="20sp"
-                        android:visibility="@{model.settings.shownThrowAmount ? View.VISIBLE : View.GONE}"
+                        android:visibility="gone"
                         tools:text="28"
                         tools:visibility="visible"/>
 
@@ -74,7 +74,7 @@
                         android:layout_height="match_parent"
                         android:layout_gravity="center_horizontal"
                         android:background="@color/gray_3"
-                        android:visibility="@{model.settings.divideScreen ? View.VISIBLE : View.GONE}"
+                        android:visibility="gone"
                         tools:visibility="visible"/>
 
                 </FrameLayout>
@@ -90,7 +90,7 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
                 android:background="@color/gray_3"
-                android:visibility="@{model.settings.divideScreen ? View.VISIBLE : View.GONE}"
+                android:visibility="gone"
                 tools:visibility="visible"/>
 
         </FrameLayout>
