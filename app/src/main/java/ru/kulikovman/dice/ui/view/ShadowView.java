@@ -1,33 +1,31 @@
 package ru.kulikovman.dice.ui.view;
 
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.databinding.BindingAdapter;
-import android.databinding.DataBindingUtil;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
 
-import ru.kulikovman.cubes.CubesViewModel;
-import ru.kulikovman.cubes.MainActivity;
-import ru.kulikovman.cubes.R;
-import ru.kulikovman.cubes.data.CubeType;
-import ru.kulikovman.cubes.databinding.ViewShadowBinding;
-import ru.kulikovman.cubes.model.Cube;
-import ru.kulikovman.cubes.model.CubeLite;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.BindingAdapter;
+import androidx.databinding.DataBindingUtil;
+import ru.kulikovman.dice.R;
+import ru.kulikovman.dice.data.Kind;
+import ru.kulikovman.dice.data.model.Cube;
+import ru.kulikovman.dice.databinding.ViewShadowBinding;
 
-public class ShadowView  extends FrameLayout {
+public class ShadowView extends FrameLayout {
 
     private ViewShadowBinding binding;
     private Context context;
 
-    private CubeType cubeType;
+    private Kind kind;
     public int angle;
     public int marginStart;
     public int marginTop;
+
+    boolean isDarkTheme;
 
     public ShadowView(@NonNull Context context) {
         super(context);
@@ -46,10 +44,11 @@ public class ShadowView  extends FrameLayout {
     }
 
     // Конструктор для генерации тени через код
-    public ShadowView(@NonNull Context context, Cube cube) {
+    public ShadowView(@NonNull Context context, Cube cube, boolean isDarkTheme) {
         super(context);
 
         // Инициализация
+        this.isDarkTheme = isDarkTheme;
         init(context);
 
         if (!isInEditMode()) {
@@ -61,22 +60,6 @@ public class ShadowView  extends FrameLayout {
         }
     }
 
-    // Конструктор для генерации тени через код
-    public ShadowView(@NonNull Context context, CubeLite cubeLite) {
-        super(context);
-
-        // Инициализация
-        init(context);
-
-        if (!isInEditMode()) {
-            // Подключение биндинга
-            binding = DataBindingUtil.bind((findViewById(R.id.shadow_view_container)));
-
-            // Ставим значения
-            setCube(cubeLite);
-        }
-    }
-
     private void init(Context context) {
         this.context = context;
 
@@ -85,7 +68,7 @@ public class ShadowView  extends FrameLayout {
     }
 
     public void setCube(Cube cube) {
-        cubeType = cube.getCubeType();
+        kind = Kind.valueOf(cube.getKindOfCube());
         angle = cube.getDegrees();
         marginStart = cube.getMarginStart();
         marginTop = cube.getMarginTop();
@@ -94,22 +77,10 @@ public class ShadowView  extends FrameLayout {
         drawShadow();
     }
 
-    public void setCube(CubeLite cubeLite) {
-        cubeType = CubeType.valueOf(cubeLite.getSkin());
-        angle = cubeLite.getAngle();
-        marginStart = cubeLite.getMarginStart();
-        marginTop = cubeLite.getMarginTop();
-
-        // Отрисовка тени
-        drawShadow();
-    }
-
     private void drawShadow() {
         // Назначение тени в соответствии с цветом
-        CubesViewModel model = ViewModelProviders.of((MainActivity) context).get(CubesViewModel.class);
-
-        String theme = model.getSettings().isDarkTheme() ? "dark" : "lite";
-        String skinName = cubeType.name().toLowerCase();
+        String theme = isDarkTheme ? "dark" : "lite";
+        String skinName = kind.name().toLowerCase();
         binding.shadow.setImageResource(getDrawableIdByName(skinName + "_" + theme + "_0")); // 0 - тень
 
         // Обновление переменной в макете

@@ -1,30 +1,17 @@
 package ru.kulikovman.dice.db;
 
+
 import java.util.List;
 
-import ru.kulikovman.cubes.model.Settings;
-import ru.kulikovman.cubes.model.ThrowResult;
+import ru.kulikovman.dice.db.model.Settings;
+import ru.kulikovman.dice.db.model.ThrowResult;
 
 public class DatabaseRepository {
 
-    private static DatabaseRepository instance;
-
     private final AppDatabase database;
 
-    private DatabaseRepository() {
-        database = App.getInstance().getDatabase();
-    }
-
-    public static DatabaseRepository get() {
-        if (instance == null) {
-            synchronized (DatabaseRepository.class) {
-                if (instance == null) {
-                    instance = new DatabaseRepository();
-                }
-            }
-        }
-
-        return instance;
+    public DatabaseRepository(AppDatabase database) {
+        this.database = database;
     }
 
     public Settings getSettings() {

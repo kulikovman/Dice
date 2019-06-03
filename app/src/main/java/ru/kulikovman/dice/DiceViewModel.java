@@ -1,5 +1,7 @@
 package ru.kulikovman.dice;
 
+import android.content.res.Resources;
+
 import java.util.List;
 
 import androidx.lifecycle.ViewModel;
@@ -18,6 +20,7 @@ public class DiceViewModel extends ViewModel {
     private DatabaseRepository databaseRepository;
     private Calculations calculations;
     private Settings settings;
+    //private Resources resources;
     private CubeGenerator cubeGenerator;
 
     public DiceViewModel(DatabaseRepository databaseRepository, Calculations calculations, Settings settings) {
@@ -43,23 +46,15 @@ public class DiceViewModel extends ViewModel {
         return !settings.isRated() && settings.getNumberOfThrow() > LIMIT_OF_THROW;
     }
 
-    /*public Settings getSettings() {
-        if (settings == null) {
-            settings = databaseRepository.getSettings();
-        }
-
-        return settings;
-    }
-
     public Calculations getCalculations() {
-        if (calculations == null) {
-            calculations = new Calculation(App.getContext().getResources());
-        }
-
         return calculations;
     }
 
-    void saveSettings() {
-        databaseRepository.saveSettings(settings);
-    }*/
+    public Settings getSettings() {
+        return settings;
+    }
+
+    public boolean isDarkTheme() {
+        return settings.isDarkTheme();
+    }
 }

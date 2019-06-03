@@ -45,7 +45,6 @@
             android:layout_height="wrap_content"
             android:src="@drawable/ic_star_gold_24dp"/>
 
-
     </LinearLayout>
 
     <Button

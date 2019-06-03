@@ -1,6 +1,5 @@
 package ru.kulikovman.dice.ui.view;
 
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
@@ -12,14 +11,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.BindingAdapter;
 import androidx.databinding.DataBindingUtil;
-import ru.kulikovman.cubes.CubesViewModel;
-import ru.kulikovman.cubes.MainActivity;
 import ru.kulikovman.dice.R;
 import ru.kulikovman.dice.data.Kind;
 import ru.kulikovman.dice.data.model.Cube;
-import ru.kulikovman.dice.data.model.CubeLite;
 import ru.kulikovman.dice.databinding.ViewCubeBinding;
-
 
 public class CubeView extends FrameLayout {
 
@@ -33,6 +28,8 @@ public class CubeView extends FrameLayout {
     public boolean isSelected;
     public int marginStart;
     public int marginTop;
+
+    boolean isDarkTheme;
 
     public CubeView(@NonNull Context context) {
         super(context);
@@ -55,10 +52,11 @@ public class CubeView extends FrameLayout {
     }
 
     // Конструктор для генерации кубика через код
-    public CubeView(@NonNull Context context, Cube cube) {
+    public CubeView(@NonNull Context context, Cube cube, boolean isDarkTheme) {
         super(context);
 
         // Инициализация
+        this.isDarkTheme = isDarkTheme;
         init(context);
 
         if (!isInEditMode()) {
@@ -67,22 +65,6 @@ public class CubeView extends FrameLayout {
 
             // Ставим значения
             setCube(cube);
-        }
-    }
-
-    // Конструктор для генерации кубика через код
-    public CubeView(@NonNull Context context, CubeLite cubeLite) {
-        super(context);
-
-        // Инициализация
-        init(context);
-
-        if (!isInEditMode()) {
-            // Подключение биндинга
-            binding = DataBindingUtil.bind((findViewById(R.id.cube_view_container)));
-
-            // Ставим значения
-            setCube(cubeLite);
         }
     }
 
@@ -126,24 +108,11 @@ public class CubeView extends FrameLayout {
         drawCube();
     }
 
-    public void setCube(CubeLite cubeLite) {
-        kind = Kind.valueOf(cubeLite.getKindOfCube());
-        value = cubeLite.getValue();
-        angle = cubeLite.getAngle();
-        marginStart = cubeLite.getMarginStart();
-        marginTop = cubeLite.getMarginTop();
-
-        // Отрисовка кубика
-        drawCube();
-    }
-
     private void drawCube() {
         // Назначение картинок в соответствии с цветом
-        CubesViewModel model = ViewModelProviders.of((MainActivity) context).get(CubesViewModel.class);
-
-        String theme = model.getSettings().isDarkTheme() ? "dark" : "lite";
+        String theme = isDarkTheme ? "dark" : "lite";
         String skinName = kind.name().toLowerCase();
-        binding.cube.setImageResource(getDrawableIdByName(skinName + "_" + theme + "_" + String.valueOf(value)));
+        binding.cube.setImageResource(getDrawableIdByName(skinName + "_" + theme + "_" + value));
 
         // Показываем тень, если указана
         // Это собственная тень кубика, для отображения через макет

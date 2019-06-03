@@ -1,7 +1,6 @@
 package ru.kulikovman.dice;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +17,6 @@ import androidx.navigation.fragment.NavHostFragment;
 import ru.kulikovman.dice.data.model.Cube;
 import ru.kulikovman.dice.databinding.FragmentBoardBinding;
 import ru.kulikovman.dice.db.model.Settings;
-import ru.kulikovman.dice.db.model.ThrowResult;
 import ru.kulikovman.dice.ui.dialog.RateDialog;
 import ru.kulikovman.dice.ui.view.CubeView;
 import ru.kulikovman.dice.ui.view.ShadowView;
@@ -27,13 +25,16 @@ import ru.kulikovman.dice.util.SoundManager;
 public class BoardFragment extends Fragment {
 
     private FragmentBoardBinding binding;
-    private DiceViewModel viewModel;
+    private DiceViewModel model;
 
     private Settings settings;
 
     private SoundManager soundManager;
 
     private boolean isReadyForThrow;
+    private int delayAfterThrow;
+
+    private int throwOnScreen = 0;
 
     @Nullable
     @Override
@@ -45,33 +46,37 @@ public class BoardFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        viewModel = ViewModelProviders.of(this).get(DiceViewModel.class);
+        model = ViewModelProviders.of(this).get(DiceViewModel.class);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         // Делаем всякие штуки при первом входе...
 
-        // Инициализация
-        isReadyForThrow = true;
 
+
+        // Задержка после броска
+        int[] delays = getResources().getIntArray(R.array.delay_after_throw);
+        delayAfterThrow = delays[settings.getDelayAfterThrow()];
 
         // Показать результат последнего броска
-
-        // Запросить отзыв (при соблюдении условий)
-        showRateDialog();
-
 
 
 
         // Обновление переменной в макете
         binding.setModel(this);
+
+        // Готовность к броску
+        isReadyForThrow = true;
+
+        // Запрос отзыв
+        showRateDialog();
+
     }
 
-    // Запрос отзыва
     private void showRateDialog() {
         // Если диалог еще не показывался и было сделано достаточно бросков
-        if (viewModel.isNeedShowRateDialog()) {
+        if (model.isNeedShowRateDialog()) {
             RateDialog rateDialog = new RateDialog();
             rateDialog.setCancelable(false);
             rateDialog.show(this.getChildFragmentManager(), "rateDialog");
@@ -114,16 +119,17 @@ public class BoardFragment extends Fragment {
         }
 
         // Подготовка к броску
+        throwOnScreen = 0;
         clearBoards();
         int total = 0;
 
-        for (Cube cube : viewModel.getCubes()) {
+        for (Cube cube : model.getCubes()) {
             // Считаем сумму кубиков
             total += cube.getValue();
 
             // Размещаем вью на экране
-            binding.topBoard.addView(new CubeView(getActivity(), cube));
-            binding.bottomBoard.addView(new ShadowView(getActivity(), cube));
+            binding.topBoard.addView(new CubeView(getActivity(), cube, model.isDarkTheme()));
+            binding.bottomBoard.addView(new ShadowView(getActivity(), cube, model.isDarkTheme()));
         }
 
         // Звук броска
@@ -139,7 +145,7 @@ public class BoardFragment extends Fragment {
             public void run() {
                 isReadyForThrow = true;
             }
-        }, settings.getDelayAfterThrow());
+        }, delayAfterThrow);
     }
 
     private void clearBoards() {
@@ -184,7 +190,7 @@ public class BoardFragment extends Fragment {
 
     private List<ThrowResult> throwResults;
     private boolean isReadyForThrow;
-    private int delayAfterThrow;
+
     private int resultOnScreen;
     public int total;
 
@@ -236,9 +242,7 @@ public class BoardFragment extends Fragment {
         // Применение темы оформления
         activity.changeTheme();
 
-        // Задержка после броска
-        int[] delays = getResources().getIntArray(R.array.delay_after_throw);
-        delayAfterThrow = delays[settings.getDelayAfterThrow()];
+
 
         // Засыпание экрана
         if (settings.isKeepScreenOn()) {
@@ -246,27 +250,6 @@ public class BoardFragment extends Fragment {
         } else {
             activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         }
-    }
-
-    private void showRateDialog() {
-        // Если диалог еще не показывался и было сделано достаточно бросков
-        if (!settings.isRated() && settings.getNumberOfThrow() > LIMIT_OF_THROW) {
-            RateDialog rateDialog = new RateDialog();
-            rateDialog.setCancelable(false);
-            rateDialog.show(this.getChildFragmentManager(), "rateDialog");
-        }
-    }
-
-    @Override
-    public void rateButtonPressed() {
-        // Отмечаем, что приложение оценено
-        settings.setRated(true);
-    }
-
-    @Override
-    public void remindLaterButtonPressed() {
-        // Сбрасываем счетчик, чтобы показать диалог позже
-        settings.setNumberOfThrow(0);
     }
 
     @Override

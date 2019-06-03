@@ -3,13 +3,13 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/shadow_view_container"
-        tools:context="ru.kulikovman.cubes.view.ShadowView">
+        tools:context="ru.kulikovman.dice.ui.view.ShadowView">
 
     <data>
 
         <variable
             name="model"
-            type="ru.kulikovman.cubes.view.ShadowView"/>
+            type="ru.kulikovman.dice.ui.view.ShadowView"/>
 
     </data>
 
