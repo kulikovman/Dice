@@ -176,7 +176,7 @@
                     android:layout_marginBottom="20dp"
                     android:orientation="horizontal">
 
-                    <ru.kulikovman.cubes.view.CubeView
+                    <ru.kulikovman.dice.ui.view.CubeView
                         android:id="@+id/white_cube"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -185,7 +185,7 @@
                         app:type="white"
                         app:value="3"/>
 
-                    <ru.kulikovman.cubes.view.CubeView
+                    <ru.kulikovman.dice.ui.view.CubeView
                         android:id="@+id/red_cube"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -194,7 +194,7 @@
                         app:type="red"
                         app:value="4"/>
 
-                    <ru.kulikovman.cubes.view.CubeView
+                    <ru.kulikovman.dice.ui.view.CubeView
                         android:id="@+id/black_cube"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

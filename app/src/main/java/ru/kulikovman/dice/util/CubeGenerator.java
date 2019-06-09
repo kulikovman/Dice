@@ -6,7 +6,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-import ru.kulikovman.dice.data.Kind;
+import ru.kulikovman.dice.data.Type;
 import ru.kulikovman.dice.data.model.Cube;
 import ru.kulikovman.dice.db.model.Settings;
 
@@ -86,7 +86,7 @@ public class CubeGenerator {
 
 
     private List<Cube> getRowCubes() {
-        Kind cubeType = Kind.valueOf(settings.getKindOfCube());
+        Type cubeType = Type.valueOf(settings.getTypeOfCube());
         List<List<Point>> points = getListOfPoints();
 
         // Создаем кубики на основе сгенерированных координат
@@ -173,10 +173,10 @@ public class CubeGenerator {
 
 
     private Cube createCube() {
-        Kind kind = Kind.valueOf(settings.getKindOfCube());
+        Type type = Type.valueOf(settings.getTypeOfCube());
 
         // Количество точек и угол поворота
-        int value = Utils.getRandomValueWithinLimits(1, kind.getNumberOfSides());
+        int value = Utils.getRandomValueWithinLimits(1, type.getNumberOfSides());
         int  degrees = Utils.getRandomValueWithinLimits(0, 359);
         int  cubeSize = calculations.getCubeSize();
         int  cubeViewSize = calculations.getCubeViewSize();
@@ -184,7 +184,7 @@ public class CubeGenerator {
         // Расположение кубика
         Point position = getCubePosition();
 
-        return new Cube(kind.name(), value, degrees, cubeSize, cubeViewSize, position);
+        return new Cube(type.name(), value, degrees, cubeSize, cubeViewSize, position);
     }
 
     private Point getCubePosition() {

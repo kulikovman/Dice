@@ -1,6 +1,6 @@
 package ru.kulikovman.dice.data;
 
-public enum Kind {
+public enum Type {
 
     WHITE(6),
     BLACK(6),
@@ -8,7 +8,7 @@ public enum Kind {
 
     private int numberOfSides;
 
-    Kind(int numberOfSides) {
+    Type(int numberOfSides) {
         this.numberOfSides = numberOfSides;
     }
 

@@ -11,7 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.databinding.BindingAdapter;
 import androidx.databinding.DataBindingUtil;
 import ru.kulikovman.dice.R;
-import ru.kulikovman.dice.data.Kind;
+import ru.kulikovman.dice.data.Type;
 import ru.kulikovman.dice.data.model.Cube;
 import ru.kulikovman.dice.databinding.ViewShadowBinding;
 
@@ -20,7 +20,7 @@ public class ShadowView extends FrameLayout {
     private ViewShadowBinding binding;
     private Context context;
 
-    private Kind kind;
+    private Type type;
     public int angle;
     public int marginStart;
     public int marginTop;
@@ -68,7 +68,7 @@ public class ShadowView extends FrameLayout {
     }
 
     public void setCube(Cube cube) {
-        kind = Kind.valueOf(cube.getKindOfCube());
+        type = Type.valueOf(cube.getKindOfCube());
         angle = cube.getDegrees();
         marginStart = cube.getMarginStart();
         marginTop = cube.getMarginTop();
@@ -80,7 +80,7 @@ public class ShadowView extends FrameLayout {
     private void drawShadow() {
         // Назначение тени в соответствии с цветом
         String theme = isDarkTheme ? "dark" : "lite";
-        String skinName = kind.name().toLowerCase();
+        String skinName = type.name().toLowerCase();
         binding.shadow.setImageResource(getDrawableIdByName(skinName + "_" + theme + "_0")); // 0 - тень
 
         // Обновление переменной в макете

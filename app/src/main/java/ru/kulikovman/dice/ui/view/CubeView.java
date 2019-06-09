@@ -12,7 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.databinding.BindingAdapter;
 import androidx.databinding.DataBindingUtil;
 import ru.kulikovman.dice.R;
-import ru.kulikovman.dice.data.Kind;
+import ru.kulikovman.dice.data.Type;
 import ru.kulikovman.dice.data.model.Cube;
 import ru.kulikovman.dice.databinding.ViewCubeBinding;
 
@@ -21,7 +21,7 @@ public class CubeView extends FrameLayout {
     private ViewCubeBinding binding;
     private Context context;
 
-    private Kind kind;
+    private Type type;
     private int value;
     public int angle;
     public boolean isShadow;
@@ -85,7 +85,7 @@ public class CubeView extends FrameLayout {
         angle = a.getInt(R.styleable.CubeView_angle, 0);
         isShadow = a.getBoolean(R.styleable.CubeView_shadow, false);
         isSelected = a.getBoolean(R.styleable.CubeView_selected, false);
-        kind = Kind.values()[a.getInt(R.styleable.CubeView_type, 0)];
+        type = Type.values()[a.getInt(R.styleable.CubeView_type, 0)];
         a.recycle();
 
         if (!isInEditMode()) {
@@ -98,7 +98,7 @@ public class CubeView extends FrameLayout {
     }
 
     public void setCube(Cube cube) {
-        kind = Kind.valueOf(cube.getKindOfCube());
+        type = Type.valueOf(cube.getKindOfCube());
         value = cube.getValue();
         angle = cube.getDegrees();
         marginStart = cube.getMarginStart();
@@ -111,7 +111,7 @@ public class CubeView extends FrameLayout {
     private void drawCube() {
         // Назначение картинок в соответствии с цветом
         String theme = isDarkTheme ? "dark" : "lite";
-        String skinName = kind.name().toLowerCase();
+        String skinName = type.name().toLowerCase();
         binding.cube.setImageResource(getDrawableIdByName(skinName + "_" + theme + "_" + value));
 
         // Показываем тень, если указана
@@ -142,7 +142,7 @@ public class CubeView extends FrameLayout {
     }
 
     public String getCubeColor() {
-        return kind.name();
+        return type.name();
     }
 
     @BindingAdapter({"android:layout_marginStart"})

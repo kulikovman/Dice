@@ -1,12 +1,16 @@
 package ru.kulikovman.dice;
 
+import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,21 +24,22 @@ import ru.kulikovman.dice.db.model.Settings;
 import ru.kulikovman.dice.ui.dialog.RateDialog;
 import ru.kulikovman.dice.ui.view.CubeView;
 import ru.kulikovman.dice.ui.view.ShadowView;
+import ru.kulikovman.dice.util.Calculations;
+import ru.kulikovman.dice.util.ShakeDetector;
 import ru.kulikovman.dice.util.SoundManager;
 
 public class BoardFragment extends Fragment {
 
     private FragmentBoardBinding binding;
-    private DiceViewModel model;
+    private MainActivity activity;
+    private CubesViewModel model;
 
     private Settings settings;
+    private Calculations calculations;
 
-    private SoundManager soundManager;
-
-    private boolean isReadyForThrow;
-    private int delayAfterThrow;
-
-    private int throwOnScreen = 0;
+    private SensorManager sensorManager;
+    private Sensor accelerometer;
+    private ShakeDetector shakeDetector;
 
     @Nullable
     @Override
@@ -46,32 +51,84 @@ public class BoardFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        model = ViewModelProviders.of(this).get(DiceViewModel.class);
+        model = ViewModelProviders.of(this).get(CubesViewModel.class);
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        this.activity = (MainActivity) context;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        // Делаем всякие штуки при первом входе...
+        init();
+        initUI();
+    }
 
+    private void init() {
+        // Обновление темы оформления
+        activity.updateTheme();
 
+        // Режим засыпания
+        activity.updateScreenState();
 
-        // Задержка после броска
-        int[] delays = getResources().getIntArray(R.array.delay_after_throw);
-        delayAfterThrow = delays[settings.getDelayAfterThrow()];
-
-        // Показать результат последнего броска
-
-
+        // Подключение детектора тряски устройства
+        shakeDetector.setOnShakeListener(new ShakeDetector.OnShakeListener() {
+            @Override
+            public void onShake(int count) {
+                // Действие при встряхивании устройства
+                Log.d("log", "Обнаружена тряска - " + count);
+                throwCubes();
+            }
+        });
 
         // Обновление переменной в макете
         binding.setModel(this);
+    }
 
-        // Готовность к броску
-        isReadyForThrow = true;
+    private void initUI() {
+        // Показать результат последнего броска
+
+        // Отрисовываем предыдущий бросок
+        showLastThrowResult();
+
+        // Отображение суммы кубиков и разделительных линий
+        showTotal(settings.isShowTotal());
+        showDividers(settings.isDivideScreen());
+
+        // Долгое нажатие по экрану
+        binding.buttonOfThrow.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                showPreviousThrowResult();
+                return true;
+            }
+        });
 
         // Запрос отзыв
         showRateDialog();
+    }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // Подключаем детектор тряски
+        sensorManager.registerListener(shakeDetector, accelerometer, SensorManager.SENSOR_DELAY_UI);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        // Отключаем детектор тряски
+        sensorManager.unregisterListener(shakeDetector);
+    }
+
+    public void openSetting() {
+        model.playSound(SoundManager.TOP_BUTTON_CLICK_SOUND);
+        NavHostFragment.findNavController(BoardFragment.this).navigate(R.id.action_cubesOnBoardFragment_to_settingFragment);
     }
 
     private void showRateDialog() {
@@ -79,7 +136,6 @@ public class BoardFragment extends Fragment {
         if (model.isNeedShowRateDialog()) {
             RateDialog rateDialog = new RateDialog();
             rateDialog.setCancelable(false);
-            rateDialog.show(this.getChildFragmentManager(), "rateDialog");
 
             // Обрабатываем выбор пользователя
             rateDialog.setListener(new RateDialog.Listener() {
@@ -95,231 +151,46 @@ public class BoardFragment extends Fragment {
                     settings.setNumberOfThrow(0);
                 }
             });
+
+            rateDialog.show(this.getChildFragmentManager(), "rateDialog");
         }
     }
 
-
-
-    // Показать результат последнего броска
-    private void showLastResult() {
-
-    }
-
-    // Показать предыдущий бросок из истории бросков
-    public void showLastResult() {
-
-    }
-
-
-    // Сделать бросок кубиков
     public void throwCubes() {
-        // Если время задержки не прошло, то выходим
-        if (!isReadyForThrow) {
+        // Бросаем только если пауза закончилась
+        if (!model.isReadyForThrow()) {
             return;
         }
 
-        // Подготовка к броску
-        throwOnScreen = 0;
-        clearBoards();
-        int total = 0;
+        // Получаем кубики и размещаем на экране
+        drawCubeOnScreen(model.getCubes());
 
-        for (Cube cube : model.getCubes()) {
-            // Считаем сумму кубиков
-            total += cube.getValue();
+        model.playSound(SoundManager.THROW_CUBES_SOUND);
 
-            // Размещаем вью на экране
-            binding.topBoard.addView(new CubeView(getActivity(), cube, model.isDarkTheme()));
-            binding.bottomBoard.addView(new ShadowView(getActivity(), cube, model.isDarkTheme()));
-        }
-
-        // Звук броска
-        soundManager.playSound(SoundManager.THROW_CUBES_SOUND);
-
-        // Сумма броска
-        binding.total.setText(String.valueOf(total));
-
-        // Задержка после броска
-        isReadyForThrow = false;
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                isReadyForThrow = true;
-            }
-        }, delayAfterThrow);
+        // Пауза после броска
+        model.pauseAfterThrow();
     }
 
-    private void clearBoards() {
-        binding.topBoard.removeAllViews();
-        binding.bottomBoard.removeAllViews();
-    }
-
-    public void openSetting() {
-        soundManager.playSound(SoundManager.TOP_BUTTON_CLICK_SOUND);
-        NavHostFragment.findNavController(BoardFragment.this).navigate(R.id.action_cubesOnBoardFragment_to_settingFragment);
-    }
-
-
-
-
-
-
-
-
-
-
-    private void showDividers(boolean isShow) {
-        binding.verticalLine.setVisibility(isShow ? View.VISIBLE : View.GONE);
-        binding.horizontalLine.setVisibility(isShow ? View.VISIBLE : View.GONE);
-    }
-
-    private void showTotal(boolean isShow) {
-        binding.total.setVisibility(isShow ? View.VISIBLE : View.GONE);
-    }
-
-
-
-
-
-
-    /*
-
-
-    private SensorManager sensorManager;
-    private Sensor accelerometer;
-    private ShakeDetector shakeDetector;
-
-    private List<ThrowResult> throwResults;
-    private boolean isReadyForThrow;
-
-    private int resultOnScreen;
-    public int total;
-
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        this.activity = (MainActivity) context;
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        // Получение вью модел
-        model = ViewModelProviders.of(activity).get(DiceViewModel.class);
-        settings = model.getSettings();
-        calculations = model.getCalculations();
-
-        // Инициализация
-        throwResults = new ArrayList<>();
-        isReadyForThrow = true;
-
-        // Подключение звука и ShakeDetector
-        SoundManager.initialize();
-        initShakeDetector();
-
-        // Отрисовываем предыдущий бросок
-        showLastThrowResult();
-
-        // Применение настроек
-        loadSettings();
-
-        // Долгое нажатие по экрану
-        binding.buttonOfThrow.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                showPreviousThrowResult();
-                return true;
-            }
-        });
-
-        // Показ диалога с оценкой
-        showRateDialog();
-
-        // Обновление переменной в макете
-        binding.setModel(this);
-    }
-
-    private void loadSettings() {
-        // Применение темы оформления
-        activity.changeTheme();
-
-
-
-        // Засыпание экрана
-        if (settings.isKeepScreenOn()) {
-            activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        } else {
-            activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        // Отключаем shakeDetector
-        sensorManager.unregisterListener(shakeDetector);
-
-        // Сохранение настроек
-        model.saveSettings();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        // Подключаем shakeDetector
-        sensorManager.registerListener(shakeDetector, accelerometer, SensorManager.SENSOR_DELAY_UI);
-    }
-
-    private void initShakeDetector() {
-        sensorManager = (SensorManager) activity.getSystemService(Context.SENSOR_SERVICE);
-        if (sensorManager != null) {
-            accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        }
-
-        shakeDetector = new ShakeDetector();
-        shakeDetector.setOnShakeListener(new ShakeDetector.OnShakeListener() {
-
-            @Override
-            public void onShake(int count) {
-                // Действие при встряхивании устройства
-                Log.d("log", "Обнаружена тряска - " + count);
-                throwCubes();
-            }
-        });
-    }
-
-
-
+    // Получаем результат последнего боска и размещаем на экране
     public void showLastThrowResult() {
-        // Номер текущего броска
-        resultOnScreen = 0;
+        List<Cube> cubes = model.getLastThrowResult();
 
-        // Получаем историю бросков
-        throwResults.clear();
-        throwResults = model.getRepository().getThrowResultList();
-
-        if (throwResults.size() != 0) {
-            // Отрисовываем последний бросок
-            drawCubeFromHistory(resultOnScreen);
+        // Если список не пустой, то отрисовываем кубики
+        if (cubes != null && cubes.size() > 0) {
+            drawCubeOnScreen(model.getLastThrowResult());
         }
     }
 
+    // Получаем результат предыдущего боска, относительно текущего
     public void showPreviousThrowResult() {
-        // Получаем список последних бросков
-        if (resultOnScreen == 0) {
-            throwResults.clear();
-            throwResults = model.getRepository().getThrowResultList();
-        }
+        final List<Cube> cubes = model.getPreviousThrowResult();
 
-        // Номер предыдущего броска
-        resultOnScreen++;
-
-        // Если в истории есть броски и текущий бросок не последний в списке
-        if (throwResults.size() != 0 && resultOnScreen < throwResults.size()) {
+        // Если список не пустой, то делаем, что нужно и отрисовываем кубики
+        if (cubes != null && cubes.size() > 0) {
             // Показываем иконку перемотки
             binding.rewindIcon.setVisibility(View.VISIBLE);
 
-            // Звук перемотки
-            SoundManager.get().playSound(SoundManager.TAPE_REWIND_SOUND);
+            model.playSound(SoundManager.TAPE_REWIND_SOUND);
 
             // Ждем когда проиграется звук перемотки
             Handler handler = new Handler();
@@ -329,93 +200,41 @@ public class BoardFragment extends Fragment {
                     // Скрываем иконку перемотки
                     binding.rewindIcon.setVisibility(View.INVISIBLE);
 
-                    // Удаляем кубики с доски
-                    clearBoards();
-
                     // Отрисовываем кубики предыдущего броска
-                    drawCubeFromHistory(resultOnScreen);
+                    drawCubeOnScreen(cubes);
                 }
             }, 600); // 600 - длительность звука перемотки
         }
     }
 
-    private void drawCubeFromHistory(int rollResultNumber) {
-        // Сбрасываем сумму
-        total = 0;
-
-        // Размещаем кубики на доске + подсчет их суммы
-        List<CubeLite> cubeLites = throwResults.get(rollResultNumber).getCubeLites();
-        for (CubeLite cubeLite : cubeLites) {
-            binding.topBoard.addView(new CubeView(activity, cubeLite));
-            binding.bottomBoard.addView(new ShadowView(activity, cubeLite));
-            total += cubeLite.getValue();
-        }
-
-        // Отображение суммы броска
-        showThrowAmount();
-    }
-
-    private void showThrowAmount() {
-        if (settings.isShownThrowAmount() && total != 0) {
-            binding.throwAmount.setText(String.valueOf(total));
-        } else {
-            binding.throwAmount.setText(null);
-        }
-    }
-
-    public void throwCubes() {
-        // Если время задержки не прошло, то выходим
-        if (!isReadyForThrow) {
-            return;
-        }
-
-        // Подготовка к броску
+    private void drawCubeOnScreen(List<Cube> cubes) {
+        // Очищаем доску и сумму
         clearBoards();
-        resultOnScreen = 0;
-        total = 0;
+        int total = 0;
 
-        // Генирируем новые кубики
-        List<Cube> cubes = CubeGenerator.get().getCubes(calculations, settings);
-
+        // Подсчет суммы и размещение кубиков на экране
         for (Cube cube : cubes) {
-            // Считаем сумму кубиков
             total += cube.getValue();
 
-            // Создаем вью кубика + тень
-            CubeView cubeView = new CubeView(activity, cube);
-            ShadowView shadowView = new ShadowView(activity, cube);
-
-            // Размещаем вью на экране
-            binding.topBoard.addView(cubeView);
-            binding.bottomBoard.addView(shadowView);
+            binding.topBoard.addView(new CubeView(activity, cube, model.isDarkTheme()));
+            binding.bottomBoard.addView(new ShadowView(activity, cube, model.isDarkTheme()));
         }
 
-        // Воспроизводим звук броска + отображение суммы
-        SoundManager.get().playSound(SoundManager.THROW_CUBES_SOUND);
-        showThrowAmount();
-
-        // Засчитываем бросок
-        settings.setNumberOfThrow(settings.getNumberOfThrow() + 1);
-
-        // Сохраняем результаты текущего броска в базу
-        ThrowResult throwResult = new ThrowResult();
-        for (Cube cube : cubes) {
-            throwResult.addCube(cube.getCubeLite());
-        }
-
-        model.getRepository().saveThrowResult(throwResult);
-
-        // Задержка после броска
-        isReadyForThrow = false;
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                isReadyForThrow = true;
-            }
-        }, delayAfterThrow);
-
-        Log.d("myLog", "---------------------------");
+        // Установка суммы броска
+        binding.total.setText(String.valueOf(total));
     }
 
-    */
+    private void clearBoards() {
+        binding.topBoard.removeAllViews();
+        binding.bottomBoard.removeAllViews();
+    }
+
+    private void showTotal(boolean isShow) {
+        binding.total.setVisibility(isShow ? View.VISIBLE : View.GONE);
+    }
+
+    private void showDividers(boolean isShow) {
+        binding.verticalLine.setVisibility(isShow ? View.VISIBLE : View.GONE);
+        binding.horizontalLine.setVisibility(isShow ? View.VISIBLE : View.GONE);
+    }
 }

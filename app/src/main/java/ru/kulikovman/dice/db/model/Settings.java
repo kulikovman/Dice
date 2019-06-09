@@ -2,7 +2,7 @@ package ru.kulikovman.dice.db.model;
 
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
-import ru.kulikovman.dice.data.Kind;
+import ru.kulikovman.dice.data.Type;
 
 @Entity
 public class Settings {
@@ -13,8 +13,8 @@ public class Settings {
     private int numberOfCubes;
     private int delayAfterThrow;
     private boolean isKeepScreenOn;
-    private boolean isShownThrowAmount;
-    private String kindOfCube;
+    private boolean isShowTotal;
+    private String typeOfCube;
 
     private int numberOfThrow;
     private boolean isRated;
@@ -28,8 +28,8 @@ public class Settings {
         numberOfCubes = 1;
         delayAfterThrow = 0;
         isKeepScreenOn = false;
-        isShownThrowAmount = false;
-        kindOfCube = Kind.WHITE.name();
+        isShowTotal = false;
+        typeOfCube = Type.WHITE.name();
         numberOfThrow = 0;
         isRated = false;
         isDivideScreen = false;
@@ -61,20 +61,20 @@ public class Settings {
         isKeepScreenOn = keepScreenOn;
     }
 
-    public boolean isShownThrowAmount() {
-        return isShownThrowAmount;
+    public boolean isShowTotal() {
+        return isShowTotal;
     }
 
-    public void setShownThrowAmount(boolean shownThrowAmount) {
-        isShownThrowAmount = shownThrowAmount;
+    public void setShowTotal(boolean showTotal) {
+        isShowTotal = showTotal;
     }
 
-    public String getKindOfCube() {
-        return kindOfCube;
+    public String getTypeOfCube() {
+        return typeOfCube;
     }
 
-    public void setKindOfCube(String kindOfCube) {
-        this.kindOfCube = kindOfCube;
+    public void setTypeOfCube(String typeOfCube) {
+        this.typeOfCube = typeOfCube;
     }
 
     public int getNumberOfThrow() {
